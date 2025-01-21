@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm/logger"
 	"test.com/devCommon/logs"
 	"test.com/devProject/config"
+	"test.com/devProject/internal/data/menu"
 )
 
 var _db *gorm.DB
@@ -30,7 +31,7 @@ func init() {
 		panic("连接数据库失败, error=" + err.Error())
 	}
 	// 自动迁移
-	err = _db.AutoMigrate()
+	err = _db.AutoMigrate(&menu.MsProjectMenu{})
 	if err != nil {
 		panic("自动迁移失败, error=" + err.Error())
 	}

@@ -35,7 +35,7 @@ func CreateToken(val string, exp time.Duration, secret string, refreshExp time.D
 	}
 }
 
-func ParseToken(tokenString string, secret string) {
+func ParseToken(tokenString string, secret string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -44,9 +44,19 @@ func ParseToken(tokenString string, secret string) {
 		return []byte(secret), nil
 	})
 
+	if err != nil {
+		return "", err
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Printf("%v \n", claims)
+		// interface断言
+		val := claims["token"].(string)
+		exp := int64(claims["exp"].(float64))
+		if time.Now().Unix() > exp {
+			return "", fmt.Errorf("token已过期")
+		}
+		return val, nil
 	} else {
-		fmt.Println(err)
+		return "", fmt.Errorf("token无效")
 	}
 }

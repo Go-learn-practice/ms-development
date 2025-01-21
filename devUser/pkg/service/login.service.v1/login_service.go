@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"strconv"
+	"strings"
 	common "test.com/devCommon"
 	"test.com/devCommon/encrypts"
 	"test.com/devCommon/errs"
@@ -197,4 +198,26 @@ func (ls *LoginService) Login(ctx context.Context, msg *login.LoginRequest) (*lo
 		OrganizationList: orgMessages,
 		TokenList:        tokenList,
 	}, nil
+}
+
+func (ls *LoginService) TokenVerify(ctx context.Context, msg *login.LoginRequest) (*login.LoginResponse, error) {
+	token := msg.Token
+	if strings.Contains(token, "bearer") {
+		token = strings.ReplaceAll(token, "bearer ", "")
+	}
+	parseToken, err := jwts.ParseToken(token, config.Conf.Jwt.AccessSecret)
+	if err != nil {
+		zap.L().Error("Login TokenVerify error", zap.Error(err))
+		return nil, errs.GrpcError(model.NoLogin)
+	}
+	//数据库查询 优化点 登录之后 应该把用户信息缓存起来
+	id, _ := strconv.ParseInt(parseToken, 10, 64)
+	memberById, err := ls.memberRepo.FindMemberById(context.Background(), id)
+	if err != nil {
+		zap.L().Error("TokenVerify db FindMemberById error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	memMsg := &login.MemberMessage{}
+	_ = copier.Copy(memMsg, memberById)
+	return &login.LoginResponse{Member: memMsg}, nil
 }

@@ -3,7 +3,9 @@ package project
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 	"net/http"
+	menus "test.com/devApi/pkg/model/project"
 	common "test.com/devCommon"
 	"test.com/devCommon/errs"
 	"test.com/devGrpc/project"
@@ -28,5 +30,7 @@ func (p *HandlerProject) index(c *gin.Context) {
 		code, msg := errs.ParseGrpcError(err)
 		c.JSON(http.StatusOK, resp.Fail(code, msg))
 	}
-	c.JSON(http.StatusOK, resp.Success(indexResponse.Menus))
+	var menusResp []*menus.MenusResponse
+	_ = copier.Copy(&menusResp, indexResponse.Menus)
+	c.JSON(http.StatusOK, resp.Success(menusResp))
 }

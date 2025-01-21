@@ -23,6 +23,7 @@ message RegisterResponse {}
 message LoginRequest {
     string account = 1;
     string password = 2;
+    string token = 3;
 }
 
 message LoginResponse{
@@ -44,6 +45,7 @@ message MemberMessage {
     int32 city = 10;
     int32 area = 11;
     string email = 12;
+    string code = 13;
 }
 
 message OrganizationMessage {
@@ -58,6 +60,7 @@ message OrganizationMessage {
     int32 province = 9;
     int32 city = 10;
     int32 area = 11;
+    string code = 12;
 }
 
 message TokenMessage {
@@ -67,8 +70,18 @@ message TokenMessage {
     int64 accessTokenExp = 4;
 }
 
+message UserRequest {
+    int64 memId = 1;
+}
+
+message OrgListResponse {
+    repeated OrganizationMessage organizationList = 1;
+}
+
 service LoginService {
     rpc Captcha(CaptchaRequest) returns (CaptchaResponse) {}
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc TokenVerify(LoginRequest) returns (LoginResponse) {}
+    rpc MyOrgList(UserRequest) returns (OrgListResponse) {}
 }

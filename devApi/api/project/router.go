@@ -3,6 +3,7 @@ package project
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"test.com/devApi/api/middle"
 	"test.com/devApi/router"
 )
 
@@ -21,5 +22,7 @@ func (routerProject *RouterProject) Route(r *gin.Engine) {
 	InitGrpcProjectClient()
 
 	h := New()
-	r.POST("/project/index", h.index)
+	group := r.Group("/project")
+	group.Use(middle.TokenVerify())
+	group.POST("/index", h.index)
 }
