@@ -14,7 +14,7 @@ func InitGrpcProjectClient() {
 	//etcdRegister := discovery.NewResolver(config.Conf.Etcd.Addrs, logs.LG)
 	//resolver.Register(etcdRegister)
 
-	// etcd:///project
+	// etcd:///pro
 	conn, err := grpc.Dial("127.0.0.1:8881", grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {

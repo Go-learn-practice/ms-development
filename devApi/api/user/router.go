@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"test.com/devApi/api/middle"
 	"test.com/devApi/router"
 )
 
@@ -24,4 +25,7 @@ func (routerUser *RouterUser) Route(r *gin.Engine) {
 	r.POST("/project/login/getCaptcha", h.getCaptcha)
 	r.POST("/project/login/register", h.register)
 	r.POST("/project/login", h.login)
+	org := r.Group("/project/organization")
+	org.Use(middle.TokenVerify())
+	org.POST("/_getOrgList", h.myOrgList)
 }

@@ -103,3 +103,22 @@ func (h *HandlerUser) login(ctx *gin.Context) {
 	// 3. 返回响应
 	ctx.JSON(http.StatusOK, resp.Success(rsp))
 }
+
+func (h *HandlerUser) myOrgList(ctx *gin.Context) {
+	result := &common.Result{}
+	memberIdStr, _ := ctx.Get("memberId")
+	memberId := memberIdStr.(int64)
+	list, err := LoginServiceClient.MyOrgList(context.Background(), &login.UserRequest{MemId: memberId})
+	if err != nil {
+		code, msg := errs.ParseGrpcError(err)
+		ctx.JSON(http.StatusOK, result.Fail(code, msg))
+		return
+	}
+	if list.OrganizationList == nil {
+		ctx.JSON(http.StatusOK, result.Success([]*user.OrganizationList{}))
+		return
+	}
+	var orgs []*user.OrganizationList
+	_ = copier.Copy(&orgs, list.OrganizationList)
+	ctx.JSON(http.StatusOK, result.Success(orgs))
+}

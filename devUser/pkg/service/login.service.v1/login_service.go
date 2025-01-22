@@ -181,6 +181,9 @@ func (ls *LoginService) Login(ctx context.Context, msg *login.LoginRequest) (*lo
 	}
 	var orgMessages []*login.OrganizationMessage
 	err = copier.Copy(&orgMessages, orgs)
+	for _, v := range orgMessages {
+		v.Code, _ = encrypts.EncryptInt64(v.Id, model.AESKey)
+	}
 	// 3. 用 jwt 生成token
 	memIdStr := strconv.FormatInt(mem.Id, 10)
 	exp := time.Duration(config.Conf.Jwt.AccessExp*24) * time.Hour
@@ -210,7 +213,7 @@ func (ls *LoginService) TokenVerify(ctx context.Context, msg *login.LoginRequest
 		zap.L().Error("Login TokenVerify error", zap.Error(err))
 		return nil, errs.GrpcError(model.NoLogin)
 	}
-	//数据库查询 优化点 登录之后 应该把用户信息缓存起来
+	//TODO: 数据库查询 优化点 登录之后 应该把用户信息缓存起来
 	id, _ := strconv.ParseInt(parseToken, 10, 64)
 	memberById, err := ls.memberRepo.FindMemberById(context.Background(), id)
 	if err != nil {
@@ -219,5 +222,22 @@ func (ls *LoginService) TokenVerify(ctx context.Context, msg *login.LoginRequest
 	}
 	memMsg := &login.MemberMessage{}
 	_ = copier.Copy(memMsg, memberById)
+	memMsg.Code, _ = encrypts.EncryptInt64(memberById.Id, model.AESKey)
 	return &login.LoginResponse{Member: memMsg}, nil
+}
+
+func (ls *LoginService) MyOrgList(ctx context.Context, msg *login.UserRequest) (*login.OrgListResponse, error) {
+	memId := msg.MemId
+	// TODO: 这里是否可以使用 MyOrgList 方法参数中的 ctx
+	orgs, err := ls.organizationRepo.FindOrganizationByMemId(context.Background(), memId)
+	if err != nil {
+		zap.L().Error("MyOrgList db FindOrganizationByMemId error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	var orgMessages []*login.OrganizationMessage
+	err = copier.Copy(&orgMessages, orgs)
+	for _, org := range orgMessages {
+		org.Code, _ = encrypts.EncryptInt64(org.Id, model.AESKey)
+	}
+	return &login.OrgListResponse{OrganizationList: orgMessages}, nil
 }
