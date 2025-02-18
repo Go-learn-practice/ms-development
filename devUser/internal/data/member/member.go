@@ -1,5 +1,6 @@
 package member
 
+// Member 员工信息表
 type Member struct {
 	Id              int64  `gorm:"primaryKey" json:"id"`
 	Account         string `gorm:"column:account" json:"account"`

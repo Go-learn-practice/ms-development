@@ -1,5 +1,5 @@
 package model
 
-var (
+const (
 	RegisterRedisKey = "REGISTER_"
 )

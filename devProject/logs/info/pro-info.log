@@ -1,0 +1,2 @@
+{"level":"INFO","time":"2025-01-27T20:50:41.983+0800","caller":"gorms/gorms.go:29","msg":"连接数据库成功"}
+{"level":"INFO","time":"2025-01-27T20:50:42.033+0800","caller":"dao/redis.go:20","msg":"初始化 redis 缓存连接"}

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"test.com/devApi/api/middle"
+	"test.com/devApi/api/rpc"
 	"test.com/devApi/router"
 )
 
@@ -19,7 +20,7 @@ func init() {
 // Route 处理具体接口信息
 func (routerUser *RouterUser) Route(r *gin.Engine) {
 	// 初始化 grpc 的客户端的连接
-	InitGrpcUserClient()
+	rpc.InitGrpcUserClient()
 
 	h := New()
 	r.POST("/project/login/getCaptcha", h.getCaptcha)

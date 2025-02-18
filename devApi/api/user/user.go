@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"net/http"
+	"test.com/devApi/api/rpc"
 	"test.com/devApi/pkg/model/user"
 	common "test.com/devCommon"
 	"test.com/devCommon/errs"
@@ -28,7 +29,7 @@ func (h *HandlerUser) getCaptcha(ctx *gin.Context) {
 	fmt.Printf("当前获取到的手机号是：%s \n", mobile)
 	c, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	loginCaptchaResponse, err := LoginServiceClient.Captcha(c, &login.CaptchaRequest{Mobile: mobile})
+	loginCaptchaResponse, err := rpc.LoginServiceClient.Captcha(c, &login.CaptchaRequest{Mobile: mobile})
 	if err != nil {
 		code, msg := errs.ParseGrpcError(err)
 		ctx.JSON(http.StatusOK, resp.Fail(code, msg))
@@ -60,7 +61,7 @@ func (h *HandlerUser) register(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp.Fail(http.StatusBadRequest, "参数解析错误"))
 		return
 	}
-	_, err = LoginServiceClient.Register(c, msg)
+	_, err = rpc.LoginServiceClient.Register(c, msg)
 	if err != nil {
 		code, msg := errs.ParseGrpcError(err)
 		ctx.JSON(http.StatusOK, resp.Fail(code, msg))
@@ -88,7 +89,7 @@ func (h *HandlerUser) login(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp.Fail(http.StatusBadRequest, err.Error()))
 		return
 	}
-	loginResponse, err := LoginServiceClient.Login(c, msg)
+	loginResponse, err := rpc.LoginServiceClient.Login(c, msg)
 	if err != nil {
 		code, msg := errs.ParseGrpcError(err)
 		ctx.JSON(http.StatusOK, resp.Fail(code, msg))
@@ -108,7 +109,7 @@ func (h *HandlerUser) myOrgList(ctx *gin.Context) {
 	result := &common.Result{}
 	memberIdStr, _ := ctx.Get("memberId")
 	memberId := memberIdStr.(int64)
-	list, err := LoginServiceClient.MyOrgList(context.Background(), &login.UserRequest{MemId: memberId})
+	list, err := rpc.LoginServiceClient.MyOrgList(context.Background(), &login.UserRequest{MemId: memberId})
 	if err != nil {
 		code, msg := errs.ParseGrpcError(err)
 		ctx.JSON(http.StatusOK, result.Fail(code, msg))

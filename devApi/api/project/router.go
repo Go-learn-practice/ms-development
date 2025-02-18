@@ -12,7 +12,7 @@ type RouterProject struct {
 
 // 注册路由
 func init() {
-	log.Println("User Router Initialized")
+	log.Println("Project Router Initialized")
 	router.Register(&RouterProject{})
 }
 
@@ -22,7 +22,7 @@ func (rp *RouterProject) Route(r *gin.Engine) {
 	InitGrpcProjectClient()
 
 	h := New()
-	group := r.Group("/pro")
+	group := r.Group("/project")
 	// 使用中间件
 	group.Use(middle.TokenVerify())
 	group.POST("/index", h.index)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"test.com/devApi/api/user"
+	"test.com/devApi/api/rpc"
 	common "test.com/devCommon"
 	"test.com/devCommon/errs"
 	"test.com/devGrpc/user/login"
@@ -19,7 +19,7 @@ func TokenVerify() func(*gin.Context) {
 		// 2. 调用rpc服务进行token人证
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-		response, err := user.LoginServiceClient.TokenVerify(ctx, &login.LoginRequest{Token: token})
+		response, err := rpc.LoginServiceClient.TokenVerify(ctx, &login.LoginRequest{Token: token})
 		if err != nil {
 			code, msg := errs.ParseGrpcError(err)
 			c.JSON(http.StatusOK, result.Fail(code, msg))

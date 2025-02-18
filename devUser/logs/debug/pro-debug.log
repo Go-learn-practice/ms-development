@@ -1,0 +1,12 @@
+{"level":"INFO","time":"2025-01-27T19:55:57.401+0800","caller":"gorms/gorms.go:28","msg":"连接数据库成功"}
+{"level":"INFO","time":"2025-01-27T19:55:57.401+0800","caller":"dao/redis.go:20","msg":"初始化 redis 缓存连接"}
+{"level":"INFO","time":"2025-01-27T20:35:44.869+0800","caller":"login.service.v1/login_service.go:62","msg":"短信平台调用成功，发送短信"}
+{"level":"INFO","time":"2025-01-27T20:38:31.426+0800","caller":"login.service.v1/login_service.go:62","msg":"短信平台调用成功，发送短信"}
+{"level":"ERROR","time":"2025-01-27T20:38:34.733+0800","caller":"login.service.v1/login_service.go:137","msg":"Register db SaveMember error","error":"Error 1054 (42S22): Unknown column 'real_name' in 'field list'"}
+{"level":"ERROR","time":"2025-01-27T20:38:51.528+0800","caller":"login.service.v1/login_service.go:137","msg":"Register db SaveMember error","error":"Error 1054 (42S22): Unknown column 'real_name' in 'field list'"}
+{"level":"INFO","time":"2025-01-27T20:55:05.693+0800","caller":"gorms/gorms.go:28","msg":"连接数据库成功"}
+{"level":"INFO","time":"2025-01-27T20:55:05.694+0800","caller":"dao/redis.go:20","msg":"初始化 redis 缓存连接"}
+{"level":"INFO","time":"2025-01-27T21:06:24.795+0800","caller":"gorms/gorms.go:28","msg":"连接数据库成功"}
+{"level":"INFO","time":"2025-01-27T21:06:24.796+0800","caller":"dao/redis.go:20","msg":"初始化 redis 缓存连接"}
+{"level":"INFO","time":"2025-01-27T21:23:25.243+0800","caller":"gorms/gorms.go:28","msg":"连接数据库成功"}
+{"level":"INFO","time":"2025-01-27T21:23:25.244+0800","caller":"dao/redis.go:20","msg":"初始化 redis 缓存连接"}

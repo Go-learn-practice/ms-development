@@ -9,7 +9,7 @@ CREATE TABLE `ms_member`
     `password`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '登陆密码',
     `name`             varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '用户昵称',
     `mobile`           varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '手机',
-    `realname`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '真实姓名',
+    `real_name`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '真实姓名',
     `create_time`      bigint(0) NULL DEFAULT NULL COMMENT '创建时间',
     `status`           tinyint(1) NULL DEFAULT 0 COMMENT '状态',
     `last_login_time`  bigint(0) NULL DEFAULT NULL COMMENT '上次登录时间',

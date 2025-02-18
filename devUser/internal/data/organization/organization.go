@@ -1,5 +1,6 @@
 package organization
 
+// Organization 组织表
 type Organization struct {
 	Id          int64  `gorm:"primaryKey" json:"id"`
 	Name        string `gorm:"column:name" json:"name"`
