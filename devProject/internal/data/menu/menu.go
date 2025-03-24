@@ -14,9 +14,9 @@ type MsProjectMenu struct {
 	Sort       uint32 `gorm:"column:sort;default:0;comment:菜单排序" json:"sort"`
 	Status     int8   `gorm:"column:status;default:1;comment:状态(0:禁用,1:启用)" json:"status"`
 	CreateBy   int64  `gorm:"column:create_by;not null;default:0;comment:创建人" json:"createBy"`
-	IsInner    uint8  `gorm:"column:is_inner;default:0;comment:是否内页" json:"isInner"`
+	IsInner    int8   `gorm:"column:is_inner;default:0;comment:是否内页" json:"isInner"`
 	Values     string `gorm:"column:values;type:varchar(255);default:null;comment:参数默认值" json:"values"`
-	ShowSlider uint8  `gorm:"column:show_slider;default:1;comment:是否显示侧边栏" json:"show_slider"`
+	ShowSlider int8   `gorm:"column:show_slider;default:1;comment:是否显示侧边栏" json:"show_slider"`
 }
 
 func (msProjectMenu *MsProjectMenu) TableName() string {
@@ -25,12 +25,22 @@ func (msProjectMenu *MsProjectMenu) TableName() string {
 
 type MsProjectMenuChild struct {
 	MsProjectMenu
-	Children []*MsProjectMenuChild
+	StatusText string `json:"statusText"`
+	InnerText  string `json:"innerText"`
+	FullUrl    string `json:"fullUrl"`
+	Children   []*MsProjectMenuChild
 }
 
 func CovertChild(pms []*MsProjectMenu) []*MsProjectMenuChild {
 	var pmcs []*MsProjectMenuChild
+
 	_ = copier.Copy(&pmcs, pms)
+	for _, v := range pmcs {
+		v.StatusText = getStatus(v.Status)
+		v.InnerText = getInnerText(v.IsInner)
+		v.FullUrl = getFullUrl(v.Url, v.Params, v.Values)
+	}
+
 	var childPmcs []*MsProjectMenuChild
 	//递归
 	for _, v := range pmcs {
@@ -56,4 +66,31 @@ func toChild(childPmcs []*MsProjectMenuChild, pmcs []*MsProjectMenuChild) {
 		}
 		toChild(pmc.Children, pmcs)
 	}
+}
+
+func getFullUrl(url string, params string, values string) string {
+	if (params != "" && values != "") || values != "" {
+		return url + "/" + values
+	}
+	return url
+}
+
+func getInnerText(inner int8) string {
+	if inner == 0 {
+		return "导航"
+	}
+	if inner == 1 {
+		return "内页"
+	}
+	return ""
+}
+
+func getStatus(status int8) string {
+	if status == 0 {
+		return "禁用"
+	}
+	if status == 1 {
+		return "使用中"
+	}
+	return ""
 }

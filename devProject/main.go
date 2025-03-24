@@ -19,6 +19,9 @@ func main() {
 		gc.Stop()
 	}
 
+	// 初始化 user grpc 客户端
+	router.InitUserGrpc()
+
 	// 启动服务
 	srv.Run(r, config.Conf.SC.Name, config.Conf.SC.Addr, stop)
 }

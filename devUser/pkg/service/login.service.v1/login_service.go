@@ -13,6 +13,7 @@ import (
 	"test.com/devCommon/encrypts"
 	"test.com/devCommon/errs"
 	"test.com/devCommon/jwts"
+	"test.com/devCommon/tms"
 	"test.com/devGrpc/user/login"
 	"test.com/devUser/config"
 	"test.com/devUser/internal/dao"
@@ -44,6 +45,7 @@ func NewLoginService() *LoginService {
 	}
 }
 
+// Captcha 获取验证码
 func (ls *LoginService) Captcha(ctx context.Context, msg *login.CaptchaRequest) (*login.CaptchaResponse, error) {
 	// 1. 获取参数
 	mobile := msg.Mobile
@@ -75,6 +77,7 @@ func (ls *LoginService) Captcha(ctx context.Context, msg *login.CaptchaRequest) 
 	}, nil
 }
 
+// Register 注册
 func (ls *LoginService) Register(ctx context.Context, msg *login.RegisterRequest) (*login.RegisterResponse, error) {
 	c := context.Background()
 	// 1. 校验参数
@@ -160,6 +163,7 @@ func (ls *LoginService) Register(ctx context.Context, msg *login.RegisterRequest
 	return &login.RegisterResponse{}, nil
 }
 
+// Login 登录
 func (ls *LoginService) Login(ctx context.Context, msg *login.LoginRequest) (*login.LoginResponse, error) {
 	c := context.Background()
 	// 1. 数据库查询 账号密码 是否正确
@@ -167,12 +171,16 @@ func (ls *LoginService) Login(ctx context.Context, msg *login.LoginRequest) (*lo
 	mem, err := ls.memberRepo.FindMember(c, msg.Account, pwd)
 	if err != nil {
 		zap.L().Error("Login db FindMember error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
 	}
 	if mem == nil {
 		return nil, errs.GrpcError(model.AccountAndPwdError)
 	}
 	memMsg := &login.MemberMessage{}
 	err = copier.Copy(memMsg, mem)
+	memMsg.Code, _ = encrypts.EncryptInt64(mem.Id, model.AESKey)
+	memMsg.LastLoginTime = tms.FormatByMilli(mem.LastLoginTime)
+	memMsg.CreateTime = tms.FormatByMilli(mem.CreateTime)
 	// 2. 根据用户id查 organization 信息
 	orgs, err := ls.organizationRepo.FindOrganizationByMemId(c, mem.Id)
 	if err != nil {
@@ -183,10 +191,18 @@ func (ls *LoginService) Login(ctx context.Context, msg *login.LoginRequest) (*lo
 	err = copier.Copy(&orgMessages, orgs)
 	for _, v := range orgMessages {
 		v.Code, _ = encrypts.EncryptInt64(v.Id, model.AESKey)
+		v.OwnerCode = memMsg.Code
+		o := organization.ToMap(orgs)[v.Id]
+		v.CreateTime = tms.FormatByMilli(o.CreateTime)
+	}
+	if len(orgs) > 0 {
+		memMsg.OrganizationCode, _ = encrypts.EncryptInt64(orgs[0].Id, model.AESKey)
 	}
 	// 3. 用 jwt 生成token
 	memIdStr := strconv.FormatInt(mem.Id, 10)
+	// 7days
 	exp := time.Duration(config.Conf.Jwt.AccessExp*24) * time.Hour
+	// 14days
 	rExp := time.Duration(config.Conf.Jwt.RefreshExp*24) * time.Hour
 	token := jwts.CreateToken(memIdStr, exp, config.Conf.Jwt.AccessSecret, rExp, config.Conf.Jwt.RefreshSecret)
 	tokenList := &login.TokenMessage{
@@ -223,6 +239,16 @@ func (ls *LoginService) TokenVerify(ctx context.Context, msg *login.LoginRequest
 	memMsg := &login.MemberMessage{}
 	_ = copier.Copy(memMsg, memberById)
 	memMsg.Code, _ = encrypts.EncryptInt64(memberById.Id, model.AESKey)
+	orgs, err := ls.organizationRepo.FindOrganizationByMemId(context.Background(), memberById.Id)
+	if err != nil {
+		zap.L().Error("TokenVerify db FindOrganizationByMemId error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	if len(orgs) > 0 {
+		memMsg.OrganizationCode, _ = encrypts.EncryptInt64(orgs[0].Id, model.AESKey)
+	}
+	// 格式化时间戳
+	memMsg.CreateTime = tms.FormatByMilli(memberById.CreateTime)
 	return &login.LoginResponse{Member: memMsg}, nil
 }
 
@@ -240,4 +266,25 @@ func (ls *LoginService) MyOrgList(ctx context.Context, msg *login.UserRequest) (
 		org.Code, _ = encrypts.EncryptInt64(org.Id, model.AESKey)
 	}
 	return &login.OrgListResponse{OrganizationList: orgMessages}, nil
+}
+
+func (ls *LoginService) FindMemInfoById(ctx context.Context, msg *login.UserRequest) (*login.MemberMessage, error) {
+	memberById, err := ls.memberRepo.FindMemberById(context.Background(), msg.MemId)
+	if err != nil {
+		zap.L().Error("FindMemInfoById db FindMemberById error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	memMsg := &login.MemberMessage{}
+	_ = copier.Copy(memMsg, memberById)
+	memMsg.Code, _ = encrypts.EncryptInt64(memberById.Id, model.AESKey)
+	orgs, err := ls.organizationRepo.FindOrganizationByMemId(context.Background(), memberById.Id)
+	if err != nil {
+		zap.L().Error("FindMemInfoById db FindOrganizationByMemId error", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	if len(orgs) > 0 {
+		memMsg.OrganizationCode, _ = encrypts.EncryptInt64(orgs[0].Id, model.AESKey)
+	}
+	memMsg.CreateTime = tms.FormatByMilli(memberById.CreateTime)
+	return memMsg, nil
 }

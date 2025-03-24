@@ -6,8 +6,8 @@ type Organization struct {
 	Name        string `gorm:"column:name" json:"name"`
 	Avatar      string `gorm:"column:avatar" json:"avatar"`
 	Description string `gorm:"column:description" json:"description"`
-	MemberId    int64  `gorm:"column:member_id" json:"member_id"`
-	CreateTime  int64  `gorm:"column:create_time" json:"create_time"`
+	MemberId    int64  `gorm:"column:member_id" json:"memberId"`
+	CreateTime  int64  `gorm:"column:create_time" json:"createTime"`
 	Personal    int32  `gorm:"column:personal" json:"personal"`
 	Address     string `gorm:"column:address" json:"address"`
 	Province    int32  `gorm:"column:province" json:"province"`
@@ -17,4 +17,13 @@ type Organization struct {
 
 func (organization *Organization) TableName() string {
 	return "ms_organization"
+}
+
+func ToMap(orgs []*Organization) map[int64]*Organization {
+	m := make(map[int64]*Organization)
+
+	for _, org := range orgs {
+		m[org.Id] = org
+	}
+	return m
 }

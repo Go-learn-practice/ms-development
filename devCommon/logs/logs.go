@@ -2,9 +2,9 @@ package logs
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -44,6 +44,7 @@ func InitLogger(cfg *LogConfig) (err error) {
 	return
 }
 
+// getEncoder 设置日志格式
 func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder

@@ -13,7 +13,7 @@ type RouterUser struct {
 
 // 注册路由
 func init() {
-	log.Println("User Router Initialized")
+	log.Println("User Router Initialized Successfully")
 	router.Register(&RouterUser{})
 }
 
@@ -23,10 +23,11 @@ func (routerUser *RouterUser) Route(r *gin.Engine) {
 	rpc.InitGrpcUserClient()
 
 	h := New()
-	r.POST("/project/login/getCaptcha", h.getCaptcha)
-	r.POST("/project/login/register", h.register)
-	r.POST("/project/login", h.login)
-	org := r.Group("/project/organization")
+	group := r.Group("/project")
+	group.POST("/login/getCaptcha", h.getCaptcha)
+	group.POST("/login/register", h.register)
+	group.POST("/login", h.login)
+	org := group.Group("/organization")
 	org.Use(middle.TokenVerify())
 	org.POST("/_getOrgList", h.myOrgList)
 }

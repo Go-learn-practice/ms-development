@@ -1,6 +1,6 @@
 syntax = "proto3";
-package project.service.v1;
-option go_package = "devProject/pkg/service/pro.service.v1";
+package project;
+option go_package = "devGrpc/project";
 
 message IndexRequest {}
 
@@ -23,7 +23,10 @@ message MenuMessage {
   int32 isInner = 12;
   string values = 13;
   int32 showSlider = 14;
-  repeated MenuMessage children = 15;
+  string statusText = 15;
+  string innerText = 16;
+  string fullUrl = 17;
+  repeated MenuMessage children = 18;
 }
 
 // TODO 类型定义已经到了 30 了，是否需要优化?
@@ -32,14 +35,48 @@ message ProjectMessage {
   string cover = 2;
   string name = 3;
   string description = 4;
-  int32 accessControlType = 5;
+  string accessControlType = 5;
   string whiteList = 6;
   int32 order = 7;
   int32 deleted = 8;
   string templateCode = 9;
-  double Schedule = 10;
+  double schedule = 10;
   string createTime = 11;
-  int64 organizationCode = 12;
+  string organizationCode = 12;
+  string deletedTime = 13;
+  int32 private = 14;
+  string prefix = 15;
+  int32 openPrefix = 16;
+  int32 archive = 17;
+  int64 archiveTime = 18;
+  int32 openBeginTime  = 19;
+  int32 openTaskPrivate  = 20;
+  string taskBoardTheme  = 21;
+  string beginTime  = 22;
+  string endTime  = 23;
+  int32 autoUpdateSchedule  = 24;
+  int64 projectCode = 25;
+  int64 memberCode = 26;
+  string joinTime  = 27;
+  int64 isOwner = 28;
+  string authorize = 29;
+  string code = 30;
+  string ownerName = 31;
+  int32 collected = 32;
+}
+
+message ProjectDetailMessage {
+  string cover = 2;
+  string name = 3;
+  string description = 4;
+  string accessControlType = 5;
+  string whiteList = 6;
+  int32 order = 7;
+  int32 deleted = 8;
+  string templateCode = 9;
+  double schedule = 10;
+  string createTime = 11;
+  string organizationCode = 12;
   string deletedTime = 13;
   int32 private = 14;
   string prefix = 15;
@@ -52,18 +89,61 @@ message ProjectMessage {
   int64 beginTime  = 22;
   int64 endTime  = 23;
   int32 autoUpdateSchedule  = 24;
-  int64 projectCode = 25;
-  int64 memberCode = 26;
-  int64 joinTime  = 27;
-  int64 isOwner = 28;
-  string authorize = 29;
-  string code = 30;
+  string code = 25;
+  string ownerName = 26;
+  int32 collected = 27;
+  string ownerAvatar = 28;
+}
+
+message SaveProjectMessage {
+  int64 id = 1;
+  string cover = 2;
+  string name = 3;
+  string description = 4;
+  string code = 5;
+  string create_time = 6;
+  string task_board_theme = 7;
+  string organization_code = 8;
 }
 
 message ProjectRpcRequest {
   int64 memberId = 1;
-  int64 page = 2;
-  int64 pageSize = 3;
+  string memberName = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+  string selectBy = 5;
+  string organizationCode = 6;
+  int32 viewType = 7;
+  string name = 8;
+  string templateCode = 9;
+  string description = 10;
+  int64 id = 11;
+  string projectCode = 12;
+  bool deleted = 13;
+  string collectType = 14;
+}
+
+message ProjectTemplateMessage {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 sort = 4;
+  string createTime = 5;
+  string organizationCode = 6;
+  string cover = 7;
+  string memberCode = 8;
+  int32 isSystem = 9;
+  repeated TaskStages taskStages = 10;
+  string code = 11;
+}
+
+message TaskStages {
+  string name = 1;
+}
+
+message ProjectTemplateResponse {
+  repeated ProjectTemplateMessage ptm = 1;
+  int64 total = 2;
 }
 
 message MyProjectResponse {
@@ -71,7 +151,33 @@ message MyProjectResponse {
   int64 total = 2;
 }
 
+message DeletedProjectResponse {}
+message CollectProjectResponse {}
+message UpdateProjectResponse {}
+
+message UpdateProjectMessage {
+  string projectCode = 1;
+  string cover = 2;
+  string name = 3;
+  string description = 4;
+  double schedule = 5;
+  int32 private = 6;
+  string prefix = 7;
+  int32 openPrefix = 8;
+  int32 openBeginTime = 9;
+  int32 openTaskPrivate = 10;
+  string taskBoardTheme = 11;
+  int32 autoUpdateSchedule = 12;
+  int64 memberId = 13;
+}
+
 service ProjectService {
   rpc Index(IndexRequest) returns (IndexResponse) {}
   rpc FindProjectByMemId(ProjectRpcRequest) returns (MyProjectResponse) {}
+  rpc FindProjectTemplate(ProjectRpcRequest) returns (ProjectTemplateResponse) {}
+  rpc SaveProject(ProjectRpcRequest) returns (SaveProjectMessage) {}
+  rpc FindProjectDetail(ProjectRpcRequest) returns (ProjectDetailMessage) {}
+  rpc UpdateDeletedProject(ProjectRpcRequest) returns (DeletedProjectResponse) {}
+  rpc UpdateCollectProject(ProjectRpcRequest) returns (CollectProjectResponse) {}
+  rpc UpdateProject(UpdateProjectMessage) returns (UpdateProjectResponse) {}
 }

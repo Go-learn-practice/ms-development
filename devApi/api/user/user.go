@@ -2,9 +2,11 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"go.uber.org/zap"
 	"net/http"
 	"test.com/devApi/api/rpc"
 	"test.com/devApi/pkg/model/user"
@@ -56,6 +58,10 @@ func (h *HandlerUser) register(ctx *gin.Context) {
 	defer cancel()
 	// 3. 调用 user grpc 服务 获取响应
 	msg := &login.RegisterRequest{}
+
+	msgStr, _ := json.Marshal(msg)
+	zap.L().Info(string(msgStr))
+
 	err = copier.Copy(msg, req)
 	if err != nil {
 		ctx.JSON(http.StatusOK, resp.Fail(http.StatusBadRequest, "参数解析错误"))

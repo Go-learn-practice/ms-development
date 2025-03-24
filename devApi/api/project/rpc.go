@@ -15,10 +15,12 @@ func InitGrpcProjectClient() {
 	//resolver.Register(etcdRegister)
 
 	// etcd:///pro
-	conn, err := grpc.Dial("127.0.0.1:8881", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("0.0.0.0:8882", grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+
+	log.Println("grpc client connected project successfully")
 	ProjectServiceClient = project.NewProjectServiceClient(conn)
 }

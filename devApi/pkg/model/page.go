@@ -3,8 +3,8 @@ package model
 import "github.com/gin-gonic/gin"
 
 type Page struct {
-	Page     int64 `json:"page" form:"page"`
-	PageSize int64 `json:"pageSize" form:"pageSize"`
+	Page     int64 `json:"page,omitempty" form:"page"`
+	PageSize int64 `json:"pageSize,omitempty" form:"pageSize"`
 }
 
 // Bind 设置请求参数

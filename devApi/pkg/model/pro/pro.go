@@ -1,24 +1,7 @@
 package pro
 
-type MenusResponse struct {
-	Id         int64            `json:"id"`
-	Pid        int64            `json:"pid"`
-	Title      string           `json:"title"`
-	Icon       string           `json:"icon"`
-	Url        string           `json:"url"`
-	FilePath   string           `json:"filePath"`
-	Params     string           `json:"params"`
-	Node       string           `json:"node"`
-	Sort       int32            `json:"sort"`
-	Status     int32            `json:"status"`
-	CreateBy   int64            `json:"createBy"`
-	IsInner    int32            `json:"isInner"`
-	Values     string           `json:"values"`
-	ShowSlider int32            `json:"showSlider"`
-	Children   []*MenusResponse `json:"children"`
-}
-
 type Project struct {
+	Id                 int64   `json:"id"`
 	Cover              string  `json:"cover"`
 	Name               string  `json:"name"`
 	Description        string  `json:"description"`
@@ -61,4 +44,63 @@ type ProjectAndMember struct {
 	JoinTime    int64  `json:"joinTime"`
 	IsOwner     int64  `json:"isOwner"`
 	Authorize   string `json:"authorize"`
+	OwnerName   string `json:"ownerName"`
+	Collected   string `json:"collected"`
+}
+
+type ProjectDetail struct {
+	Project
+	OwnerName   string `json:"ownerName"`
+	Collected   string `json:"collected"`
+	OwnerAvatar string `json:"ownerAvatar"`
+}
+
+type ProjectTemplate struct {
+	Id               int                   `json:"id"`
+	Name             string                `json:"name"`
+	Description      string                `json:"description"`
+	Sort             int                   `json:"sort"`
+	CreateTime       string                `json:"createTime"`
+	OrganizationCode int64                 `json:"organizationCode"`
+	Cover            string                `json:"cover"`
+	MemberCode       string                `json:"memberCode"`
+	IsSystem         int                   `json:"isSystem"`
+	TaskStages       []*TaskStagesOnlyName `json:"taskStages"`
+	Code             string                `json:"code"`
+}
+
+type TaskStagesOnlyName struct {
+	Name string `json:"name"`
+}
+
+type SaveProjectRequest struct {
+	Name         string `json:"name" form:"name"`
+	TemplateCode string `json:"templateCode" form:"templateCode"`
+	Description  string `json:"description" form:"description"`
+	Id           int    `json:"id" form:"id"`
+}
+
+type SaveProject struct {
+	Id               int64  `json:"id"`
+	Cover            string `json:"cover"`
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+	Code             string `json:"code"`
+	CreateTime       string `json:"createTime"`
+	TaskBoardTheme   string `json:"taskBoardTheme"`
+	OrganizationCode string `json:"organizationCode"`
+}
+
+type ProjectReq struct {
+	ProjectCode        int64  `json:"projectCode" form:"projectCode"`
+	Cover              string `json:"cover" form:"cover"`
+	Name               string `json:"name" form:"name"`
+	Description        string `json:"description" form:"description"`
+	Schedule           int    `json:"schedule" form:"schedule"`
+	Private            int    `json:"private" form:"private"`
+	OpenPrefix         int    `json:"openPrefix" form:"openPrefix"`
+	Prefix             string `json:"prefix" form:"prefix"`
+	OpenTaskPrivate    int    `json:"openTaskPrivate" form:"openTaskPrivate"`
+	TaskBoardTheme     string `json:"taskBoardTheme" form:"taskBoardTheme"`
+	AutoUpdateSchedule int    `json:"autoUpdateSchedule" form:"autoUpdateSchedule"`
 }

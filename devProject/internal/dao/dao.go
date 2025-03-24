@@ -5,20 +5,21 @@ import (
 	"test.com/devProject/internal/database/gorms"
 )
 
+// Transaction 事务
 type Transaction struct {
 	conn database.DbConn
 }
 
-func (t *Transaction) Action(fn func(conn database.DbConn) error) error {
-	t.conn.Begin()
-	err := fn(t.conn)
+func (tx *Transaction) Action(fn func(conn database.DbConn) error) error {
+	tx.conn.Begin()
+	err := fn(tx.conn)
 	if err != nil {
 		// 回滚
-		t.conn.Rollback()
+		tx.conn.Rollback()
 		return err
 	}
 	// 提交
-	t.conn.Commit()
+	tx.conn.Commit()
 	return nil
 }
 

@@ -2,9 +2,9 @@ server:
   name: "dev-api"
   addr: "127.0.0.1:8889"
 zap:
-  debugFileName: "logs/debug/pro-debug.log"
-  infoFileName: "logs/info/pro-info.log"
-  warnFileName: "logs/error/pro-error.log"
+  debugFileName: "C:\\Pro\\Golang\\msDevelopment\\logs\\debug\\pro-debug.log"
+  infoFileName: "C:\\Pro\\Golang\\msDevelopment\\logs\\info\\pro-info.log"
+  warnFileName: "C:\\Pro\\Golang\\msDevelopment\\logs\\error\\pro-error.log"
   maxSize: 500,
   maxAge: 28,
   MaxBackups: 3
